@@ -1,8 +1,8 @@
 // app/api/chat/route.ts
 
-import { chatChain } from "../lib/langchain/chatChain";
-import  { getHistory }  from "../lib/memory/inMemoryStore";
-import { appendMessage } from "../lib/memory/inMemoryStore";
+import { chatChain } from "../../lib/langchain/chatChain";
+import  { getHistory }  from "../../lib/memory/inMemoryStore";
+import { appendMessage } from "../../lib/memory/inMemoryStore";
 
 export async function POST(req: Request) {
   const { sessionId, message } = await req.json();

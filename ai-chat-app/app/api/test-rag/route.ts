@@ -1,5 +1,5 @@
-import { loadSampleData } from "@/app/lib/rag/loadSampleData";
-import { vectorStore } from "@/app/lib/rag/vectorStore";
+import { loadSampleData } from "@/lib/rag/loadSampleData";
+import { vectorStore } from "@/lib/rag/vectorStore";
 
 export async function GET() {
 
