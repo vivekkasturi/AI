@@ -11,9 +11,14 @@ const model = new ChatGroq({
 
 const prompt = ChatPromptTemplate.fromTemplate(`
 You are a helpful AI assistant.
-Conversation so far:
-{history}
-User: {input}`);
+Use this context to answer:
+Context:
+{context}
+
+User:
+{input}
+Answer:
+`);
 
 
 

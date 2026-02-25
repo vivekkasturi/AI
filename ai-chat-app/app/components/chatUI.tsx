@@ -1,4 +1,5 @@
 'use client'
+
 import { useRef, useState } from "react";
 
 type Message = {
@@ -7,89 +8,164 @@ type Message = {
 };
 
 export default function ChatUI() {
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+
   const controller = useRef<AbortController | null>(null);
 
-
-  const sessionId = "demo-session"; // later this can be dynamic
+  const sessionId = "demo-session";
 
   const sendMessage = async () => {
+
     if (!input.trim()) return;
+
     const abortController = new AbortController();
     controller.current = abortController;
-    const userMessage: Message = { role: "user", content: input };
+
+    const userMessage: Message = {
+      role: "user",
+      content: input
+    };
+
     setMessages(prev => [...prev, userMessage]);
+
     setInput("");
+
     setLoading(true);
 
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        sessionId,
-        message: input,
-      }),
-      signal: abortController.signal
-    });
+    try {
 
-    const reader = response.body?.getReader();
-    const decoder = new TextDecoder();
+      const response = await fetch("/api/chat", {
 
-    let assistantMessage = "";
+        method: "POST",
 
-    setMessages(prev => [...prev, { role: "assistant", content: "" }]);
-    if (reader) {
-      try{
+        headers: {
+          "Content-Type": "application/json"
+        },
 
-      
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+        body: JSON.stringify({
+          sessionId,
+          message: userMessage.content
+        }),
 
-        const chunk = decoder.decode(value);
-        assistantMessage += chunk;
+        signal: abortController.signal
 
-        setMessages(prev => {
-          const updated = [...prev];
-          updated[updated.length - 1] = {
-            role: "assistant",
-            content: assistantMessage,
-          };
-          return updated;
-        });
+      });
+
+      if (!response.ok) {
+        throw new Error("API failed");
       }
+
+      const reader = response.body?.getReader();
+
+      const decoder = new TextDecoder();
+
+      let assistantMessage = "";
+
+      setMessages(prev => [
+        ...prev,
+        { role: "assistant", content: "" }
+      ]);
+
+      if (reader) {
+
+        while (true) {
+
+          const { done, value } = await reader.read();
+
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+
+          assistantMessage += chunk;
+
+          setMessages(prev => {
+
+            const updated = [...prev];
+
+            updated[updated.length - 1] = {
+
+              role: "assistant",
+
+              content: assistantMessage
+
+            };
+
+            return updated;
+
+          });
+
+        }
+
+      }
+
     }
-    catch(error){
-     console.error("Error reading stream:", error);
+    catch (error) {
+
+      console.error(error);
+
+    }
+    finally {
+
+      setLoading(false);
+
     }
 
-    setLoading(false);
   };
-  }
+
   return (
-    <div style={{ padding: "20px", maxWidth: "600px", margin: "auto" }}>
+
+    <div style={{ padding: 20, maxWidth: 600, margin: "auto" }}>
+
       <h2>AI Chat</h2>
 
-      <div style={{ marginBottom: "20px" }}>
+      <div style={{ marginBottom: 20 }}>
+
         {messages.map((msg, index) => (
-          <div key={index} style={{ marginBottom: "10px" }}>
+
+          <div key={index}>
+
             <strong>{msg.role}:</strong> {msg.content}
+
           </div>
+
         ))}
+
       </div>
 
       <input
+
         value={input}
+
         onChange={e => setInput(e.target.value)}
-        placeholder="Type a message..."
-        style={{ width: "70%", padding: "8px" }}
+
+        style={{ border: "1px solid balck", width: "70%", padding: 8 }}
+
       />
+
       <button onClick={sendMessage} disabled={loading}>
+
         {loading ? "Thinking..." : "Send"}
+
       </button>
-      <button onClick={() => controller?.current?.abort()} disabled={loading} style={{ marginLeft: "10px" }}>Stop</button>
+
+      <button
+
+        onClick={() => controller.current?.abort()}
+
+        disabled={!loading}
+
+      >
+
+        Stop
+
+      </button>
+
     </div>
+
   );
+
 }
+

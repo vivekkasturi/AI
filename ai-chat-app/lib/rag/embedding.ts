@@ -1,9 +1,8 @@
-import { OpenAIEmbeddings } from "@langchain/openai";
+import { OllamaEmbeddings } from "@langchain/ollama";
 
-const embeddings = new OpenAIEmbeddings({
-    apiKey: process.env.OPENAI_API_KEY,
-    model: "text-embedding-3-small",
+const embeddings = new OllamaEmbeddings({
+  model: "mxbai-embed-large",
 });
 
 export default embeddings;
-    
+
