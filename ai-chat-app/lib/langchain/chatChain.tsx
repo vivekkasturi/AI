@@ -24,4 +24,4 @@ Answer:
 
 export const chatChain = prompt
                             .pipe(model)
-                            .pipe(new StringOutputParser)
+                            .pipe(new StringOutputParser())
