@@ -1,3 +1,4 @@
+import { rerankDocuments } from "./reranker";
 import { getVectorStore } from "./vectorStore";
 
 export const retrieveContext = async (query: string, llm: any) => {
@@ -42,12 +43,16 @@ console.log("Generated query variations:", generated);
   );
 
   console.log("Unique documents after deduplication:", uniqueDocs);
+  const rankedDocs = await rerankDocuments(query, uniqueDocs, llm);
   // Step 4: Build context
-  const context = uniqueDocs
-    .slice(0, 6)
-    .map((doc) => doc.pageContent)
+  const context = rankedDocs
+                      .map((doc:any) => doc.pageContent)
     .join("\n\n");
 
     console.log("Final context to be used for answering:", context);
+    console.log("Context length (characters):", context.length);
+    console.log("Docs before reranking:", docs.length);
+    console.log("Docs after reranking:", rankedDocs.length);
+    
   return context;
 };

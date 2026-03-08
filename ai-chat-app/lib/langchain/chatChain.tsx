@@ -2,7 +2,7 @@ import { ChatGroq } from "@langchain/groq";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 
-const model = new ChatGroq({
+export const model = new ChatGroq({
     apiKey: process.env.GROQ_API_KEY,
     model: "llama-3.1-8b-instant", // free model
     temperature: 0.2,
