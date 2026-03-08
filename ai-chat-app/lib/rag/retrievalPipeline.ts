@@ -54,6 +54,6 @@ console.log("Generated query variations:", generated);
     
 
     const context = buildContext(rankedDocs, 1200);
-
+    console.log("Final Context:", context);
   return context;
 };

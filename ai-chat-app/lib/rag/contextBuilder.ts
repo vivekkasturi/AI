@@ -11,5 +11,5 @@ export const buildContext = (docs: any[], maxTokens: number= 1200) => {
             totalTokens += docTokens;
         }
     }
-
+return selectedDocs.map(doc => doc.pageContent).join("\n\n");
 }
