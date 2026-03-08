@@ -11,12 +11,21 @@ export const model = new ChatGroq({
 
 const prompt = ChatPromptTemplate.fromTemplate(`
 You are a helpful AI assistant.
-Use this context to answer:
+
+Answer the user's question using ONLY the provided context.
+
 Context:
 {context}
 
-User:
+Question:
 {input}
+
+Rules:
+- Use only the provided context.
+- If the answer is not present in the context, say:
+  "I don't know based on the provided documents."
+- Do not make up information.
+
 Answer:
 `);
 
