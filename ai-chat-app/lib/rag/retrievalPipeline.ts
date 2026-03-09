@@ -19,7 +19,7 @@ console.log("vectorStore output:", vectorStore);
   
   User question: ${query}
   `;
-
+  console.log("User Query:", query);
   const response = await llm.invoke(prompt);
 console.log("LLM response for query generation:", response);
   const generated = response.content
@@ -39,6 +39,10 @@ console.log("Generated query variations:", generated);
   }
   console.log("Retrieved documents from vector store:", docs);
 
+  console.log(
+    "Retrieved Docs:",
+    docs.map((d) => d.pageContent)
+  );
   // Step 3: Remove duplicate chunks
   const uniqueDocs = Array.from(
     new Map(docs.map((doc) => [doc.pageContent, doc])).values()
@@ -51,7 +55,10 @@ console.log("Generated query variations:", generated);
     // console.log("Context length (characters):", context.length);
     console.log("Docs before reranking:", docs.length);
     console.log("Docs after reranking:", rankedDocs.length);
-    
+    console.log(
+      "Reranked Docs:",
+      rankedDocs.map((d:any) => d.pageContent)
+    );
 
     const context = buildContext(rankedDocs, 1200);
     console.log("Final Context:", context);

@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     context,
     input: message,
   });
-
+  console.log("LLM Response:", response);
   return NextResponse.json({
     response,
   });
