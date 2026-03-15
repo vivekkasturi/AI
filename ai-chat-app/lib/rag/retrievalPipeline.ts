@@ -2,11 +2,14 @@ import build from "next/dist/build";
 import { rerankDocuments } from "./reranker";
 import { getVectorStore } from "./vectorStore";
 import { buildContext } from "./contextBuilder";
-
+import { rewriterQuery } from "./queryRewriter";
 export const retrieveContext = async (query: string, llm: any) => {
 
   const vectorStore = await getVectorStore();
 console.log("vectorStore output:", vectorStore);
+// rewrite the query to make it more effective for retrieval, this is optional but can help improve results
+const rewrittenQuery = await rewriterQuery(query, llm);
+
   // Step 1: Generate query variations
   const prompt = `
   You are helping retrieve documents from a knowledge base.
@@ -17,7 +20,7 @@ console.log("vectorStore output:", vectorStore);
   Do not include explanations.
   Each query must be on a new line.
   
-  User question: ${query}
+  User question: ${rewrittenQuery}
   `;
   console.log("User Query:", query);
   const response = await llm.invoke(prompt);
@@ -27,7 +30,7 @@ console.log("LLM response for query generation:", response);
     .map((q: string) => q.trim())
     .filter(Boolean);
 console.log("Generated query variations:", generated);
-  const queries = [query, ...generated];
+  const queries = [rewrittenQuery, ...generated];
 
   console.log("Generated queries:", queries);
   // Step 2: Run vector search
