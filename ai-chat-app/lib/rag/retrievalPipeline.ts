@@ -2,6 +2,8 @@ import build from "next/dist/build";
 import { rerankDocuments } from "./reranker";
 import { getVectorStore } from "./vectorStore";
 import { buildContext } from "./contextBuilder";
+import { logRAG } from "./ragLogger";
+import { log } from "console";
 
 export const retrieveContext = async (query: string, llm: any) => {
 
@@ -62,5 +64,14 @@ console.log("Generated query variations:", generated);
 
     const context = buildContext(rankedDocs, 1200);
     console.log("Final Context:", context);
+
+    logRAG({
+      query,
+      rewrittenQuery: generated.join(" | "),
+      generatedQueries: generated,
+      retrievedDocs: docs,
+      rerankedDocs: rankedDocs,
+      context,
+    });
   return context;
 };
