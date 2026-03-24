@@ -14,7 +14,7 @@ Rules:
 
 export const planner = async(query:string, llm: ChatGroq) => {
     const chain = plannerPrompt.pipe(llm);
-    const response = await chain.invoke({query});
+    const response:any = await chain.invoke({query});
     const steps = response.content.split("\n").map((s:string) => s.trim()).filter(Boolean);
     return steps;
 }
