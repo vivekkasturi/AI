@@ -31,7 +31,18 @@ export const routeQuery = async (query: string,llm:ChatGroq
 
 
     const chain = multiAgentPrompt.pipe(llm);
-    const response  = await chain.invoke({query});
+    const response :any = await chain.invoke({query});
   return response.content;
   }
   
+
+// export async function routerNode(state: any) {
+//     console.log("👉 router IN:", state);
+  
+//     const newState = {
+//       ...state,
+//     };
+  
+//     console.log("✅ router OUT:", newState);
+//     return newState;
+//   }

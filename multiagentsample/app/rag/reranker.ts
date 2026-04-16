@@ -1,23 +1,38 @@
-export const rerankDocuments = async (query: string, docs: any, llm: any) => {
+export async function rerankDocuments(query: string, docs: any[], llm: any) {
+  try {
+    if (!docs.length) return [];
 
-const docsText = docs.map((doc: any, i:any) => `Docs ${i+1}: ${doc.pageContent}`).join("\n\n");
+    const prompt = `
+You are ranking documents based on relevance.
 
-const prompt = `
-You are helping retrieve documents from a knowledge base.
-Given the following user question and retrieved documents, rank the documents based on relevance to the question.
-Return the document numbers in order of relevance, separated by commas. Do not include any explanations.
-User question: ${query}
-${docsText}
+Query: ${query}
+
+Documents:
+${docs.map((d, i) => `${i + 1}. ${d.pageContent}`).join("\n\n")}
+
+Return the numbers of the most relevant documents (comma separated).
+Example: 1,3
 `;
+
     const response = await llm.invoke(prompt);
-    const order = response.content
-    .replace(/\s/g, "")
-    .split(",")
-    .map((num: string) => parseInt(num) - 1);
 
-  const rankedDocs = order
-    .map((index: number) => docs[index])
-    .filter(Boolean);
+    const text = response.content || "";
 
-  return rankedDocs.slice(0, 3); // top 3
+    const indices = text
+      .match(/\d+/g)
+      ?.map((n: string) => parseInt(n) - 1)
+      .filter((i: number) => i >= 0 && i < docs.length);
+
+    // ✅ If parsing fails → fallback
+    if (!indices || indices.length === 0) {
+      console.log("⚠️ Reranker fallback triggered");
+      return docs;
+    }
+
+    return indices.map((i: number) => docs[i]);
+
+  } catch (err) {
+    console.log("❌ Reranker failed → fallback", err);
+    return docs; // ✅ NEVER break pipeline
+  }
 }

@@ -47,7 +47,6 @@ export default function ChatUI() {
         },
 
         body: JSON.stringify({
-          sessionId,
           message: userMessage.content
         }),
 
