@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 type Message = {
   role: "user" | "assistant";
@@ -13,22 +13,18 @@ export default function ChatUI() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const controller = useRef<AbortController | null>(null);
-
   const sessionId = "demo-session";
 
   const sendMessage = async () => {
 
     if (!input.trim()) return;
 
-    const abortController = new AbortController();
-    controller.current = abortController;
-
     const userMessage: Message = {
       role: "user",
       content: input
     };
 
+    // Add user message
     setMessages(prev => [...prev, userMessage]);
 
     setInput("");
@@ -47,125 +43,63 @@ export default function ChatUI() {
         },
 
         body: JSON.stringify({
+          sessionId,
           message: userMessage.content
         }),
-
-        signal: abortController.signal
-
       });
 
       if (!response.ok) {
         throw new Error("API failed");
       }
 
-      const reader = response.body?.getReader();
+      // ✅ Read full response (NO STREAMING)
+      const text = await response.text();
 
-      const decoder = new TextDecoder();
+      // Add assistant message
+      setMessages(prev => [
+        ...prev,
+        { role: "assistant", content: text }
+      ]);
 
-      let assistantMessage = "";
+    } catch (error) {
+      console.error("❌ Error:", error);
 
       setMessages(prev => [
         ...prev,
-        { role: "assistant", content: "" }
+        { role: "assistant", content: "Something went wrong." }
       ]);
-
-      if (reader) {
-
-        while (true) {
-
-          const { done, value } = await reader.read();
-
-          if (done) break;
-
-          const chunk = decoder.decode(value);
-
-          assistantMessage += chunk;
-
-          setMessages(prev => {
-
-            const updated = [...prev];
-
-            updated[updated.length - 1] = {
-
-              role: "assistant",
-
-              content: assistantMessage
-
-            };
-
-            return updated;
-
-          });
-
-        }
-
-      }
-
-    }
-    catch (error) {
-
-      console.error(error);
-
-    }
-    finally {
-
+    } finally {
       setLoading(false);
-
     }
-
   };
 
   return (
-
     <div style={{ padding: 20, maxWidth: 600, margin: "auto" }}>
-
       <h2>AI Chat</h2>
 
       <div style={{ marginBottom: 20 }}>
-
         {messages.map((msg, index) => (
-
-          <div key={index}>
-
+          <div key={index} style={{ marginBottom: 8 }}>
             <strong>{msg.role}:</strong> {msg.content}
-
           </div>
-
         ))}
-
       </div>
 
       <input
-
         value={input}
-
         onChange={e => setInput(e.target.value)}
-
-        style={{ border: "1px solid balck", width: "70%", padding: 8 }}
-
+        placeholder="Type your message..."
+        style={{
+          border: "1px solid black",
+          width: "70%",
+          padding: 8,
+          marginRight: 10
+        }}
       />
 
       <button onClick={sendMessage} disabled={loading}>
-
         {loading ? "Thinking..." : "Send"}
-
       </button>
-
-      <button
-
-        onClick={() => controller.current?.abort()}
-
-        disabled={!loading}
-
-      >
-
-        Stop
-
-      </button>
-
     </div>
-
   );
-
 }
-
