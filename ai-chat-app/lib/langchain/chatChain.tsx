@@ -2,7 +2,7 @@ import { ChatGroq } from "@langchain/groq";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 
-const model = new ChatGroq({
+export const model = new ChatGroq({
     apiKey: process.env.GROQ_API_KEY,
     model: "llama-3.1-8b-instant", // free model
     temperature: 0.2,
@@ -10,14 +10,20 @@ const model = new ChatGroq({
   });
 
 const prompt = ChatPromptTemplate.fromTemplate(`
-You are a helpful AI assistant.
-Use this context to answer:
-Context:
-{context}
+You are a query router.
+Classify the user query into one of the following categories:
 
-User:
-{input}
-Answer:
+- "rag" → if the query is about company policies, documents, or internal knowledge
+- "general" → if the query is general knowledge (React, coding, world facts, etc.)
+
+Rules:
+- Return ONLY one word: rag OR general
+- Do not explain
+
+User Query:
+{query}
+
+Category:
 `);
 
 
