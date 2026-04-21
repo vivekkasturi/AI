@@ -1,20 +1,32 @@
 import { describe, it, expect, vi } from "vitest";
+
+type MockRetriever = {
+  id: string;
+};
+
 describe("createMultiQueryRetriever", () => {
   it("creates a MultiQueryRetriever using the provided llm and vectorStore", async () => {
-    const mockLLM = {} as any;
-    const mockVectorStore = {} as any;
+    const mockLLM = {};
+    const mockVectorStore = {};
     const mockBaseRetriever = { id: "base-retriever" };
     const mockMultiQueryRetriever = {
       llm: mockLLM,
       retriever: mockBaseRetriever,
     };
 
-    const createBaseRetriever = vi.fn().mockReturnValue(mockBaseRetriever);
+    const createBaseRetriever = vi
+      .fn<(vectorStore: unknown) => MockRetriever>()
+      .mockReturnValue(mockBaseRetriever);
 
-    const createMultiQueryRetriever = async (llm: any, vectorStore: any) => {
-      const baseRetriever = createBaseRetriever(vectorStore);
-      const retriever = await Promise.resolve(mockMultiQueryRetriever);
-      return retriever;
+    const createMultiQueryRetriever = async (
+      llm: unknown,
+      vectorStore: unknown
+    ) => {
+      createBaseRetriever(vectorStore);
+      return Promise.resolve({
+        llm,
+        retriever: mockBaseRetriever,
+      });
     };
 
     const result = await createMultiQueryRetriever(mockLLM, mockVectorStore);
@@ -23,5 +35,4 @@ describe("createMultiQueryRetriever", () => {
     expect(result).toBe(mockMultiQueryRetriever);
   });
 });
-
 

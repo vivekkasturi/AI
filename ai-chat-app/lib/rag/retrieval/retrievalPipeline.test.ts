@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import type { Document } from "langchain/document";
 
 describe("retrieveContext", () => {
@@ -25,4 +25,3 @@ describe("retrieveContext", () => {
     expect(result).toBe("");
   });
 });
-

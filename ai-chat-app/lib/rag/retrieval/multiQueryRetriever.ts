@@ -1,7 +1,13 @@
-import { MultiQueryRetriever } from "@langchain/community/retrievers/multi_query";
+import { MultiQueryRetriever } from "@langchain/classic/retrievers/multi_query";
+import { ChatGroq } from "@langchain/groq";
 import { createBaseRetriever } from "./baseRetriever";
 
-export const createMultiQueryRetriever = async (llm: any, vectorStore: any) => {
+type VectorStoreInput = Parameters<typeof createBaseRetriever>[0];
+
+export const createMultiQueryRetriever = async (
+  llm: ChatGroq,
+  vectorStore: VectorStoreInput
+) => {
   const baseRetriever = createBaseRetriever(vectorStore);
 
   const retriever = await MultiQueryRetriever.fromLLM({
