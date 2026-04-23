@@ -72,8 +72,7 @@
 
 import { NextRequest } from "next/server";
 import { ChatGroq } from "@langchain/groq";
-import { createGraph } from "@/app/lib/langgraph/graph";
-
+import { functionAgentLoop } from "../lib/agent/functionAgentLoop";
 // ✅ MUST be named export
 export async function POST(req: NextRequest) {
   try {
@@ -84,11 +83,11 @@ export async function POST(req: NextRequest) {
       model: "llama-3.1-8b-instant",
     });
 
-    const graph = createGraph(llm);
+   const result = await functionAgentLoop(message);
 
-    const result = await graph.invoke({
-      input: message,
-    });
+    // const result = await graph.invoke({
+    //   input: message,
+    // });
 
     console.log("Final Result from LangGraph:", result);
 
