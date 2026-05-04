@@ -25,7 +25,7 @@ export const logRAG = (data: {
       data.rerankedDocs.map((d) => d.pageContent)
     )
   
-    console.log(" Final Context:", data.context)
+    console.log(" Final Context143:", data.context)
   
     console.log(" RAG DEBUG END ======================")
   }

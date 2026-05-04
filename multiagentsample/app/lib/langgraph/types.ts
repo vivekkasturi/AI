@@ -1,11 +1,8 @@
-import { Annotation } from "@langchain/langgraph";
-
-export const GraphState = Annotation.Root({
-  input: Annotation<string>(),
-  plan: Annotation<string>(),
-  research_data: Annotation<string>(), // ✅ renamed
-  output: Annotation<string>(),
-  route: Annotation<string>(),
-  general_data: Annotation<string>(),
-});
-
+export type GraphState = {
+  input: string;
+  messages?:{ role: "user" | "assistant"; content: string }[];
+  route: "tool" | "rag" | "general";
+  tool_callS?:any[];
+  tool_result?:any [];
+  output?: string;
+}

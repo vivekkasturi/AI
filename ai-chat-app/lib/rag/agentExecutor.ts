@@ -1,6 +1,6 @@
 import { ChatGroq } from "@langchain/groq";
 import { planner } from "./planner";
-import { retrieveContext } from "./retrievalPipeline";
+import { retrieveContext } from "./retrieveContext";
 
 const llm = new ChatGroq({
     apiKey: process.env.GROQ_API_KEY,

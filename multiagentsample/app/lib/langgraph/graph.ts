@@ -134,6 +134,8 @@ import { researchNode } from "./nodes/researchNode";
 import { writerNode } from "./nodes/writerNode";
 import { generalNode } from "./nodes/generalNode";
 import { retrieveContext } from "@/app/rag/retrieveContext";
+import finalNode from "../../../../ai-chat-app/lib/langGraph/finalNode";
+import memoryNode from "../../../../ai-chat-app/lib/langGraph/memory/memoryNode";
 
 export function createGraph(llm: any) {
   const graph = new StateGraph(GraphState);
@@ -143,22 +145,27 @@ export function createGraph(llm: any) {
   graph.addNode("research_node", (state) => researchNode(state,llm));
   graph.addNode("writer", (state) => writerNode(state, llm));
   graph.addNode("general", (state) => generalNode(state, llm)); // ✅
+  graph.addNode("final", (state) => finalNode(state, llm)); // ✅
+  graph.addNode("memory", (state) => memoryNode(state)); // ✅
 
   graph.addEdge(START, "router");
 
   graph.addConditionalEdges("router", async (state) => {
     console.log("Routing decision based on state:", state.route);
-    if (state.route === "rag") return "planner";
-
-    return "general"; // ✅ Directly route to general if not RAG
+    if (state.route === "rag") return "rag";{
+      // ✅ For RAG, we go through the planner, research, and writer nodes
+      graph.addEdge("planner", "research_node");
+      graph.addEdge("research_node", "writer");
+      graph.addEdge("writer", "final"); // ✅ After writing, go to final node
+    }
+    if (state.route === "tool") return "tool";{
+      // ✅ For Tool use case, we can directly go to a memory node or a tool execution node
+      graph.addEdge("tool", "memory"); // Example: after deciding to use a tool, we go to memory to store the interaction
+      graph.addEdge("memory", "final"); // Then we go to final node
+    }
+    if (state.route === "general") return "general";
   });
-
-
-  graph.addEdge("planner", "research_node");
-  graph.addEdge("research_node", "writer");
-  graph.addEdge("writer", END);
-
-  graph.addEdge("general", END); // ✅
+  
 
   return graph.compile();
 }
