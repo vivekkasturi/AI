@@ -15,8 +15,11 @@ export default function ChatUI() {
 
   const controller = useRef<AbortController | null>(null);
 
-  const sessionId = "demo-session";
+  const sessionId = useRef(Date.now().toString());
 
+  localStorage.setItem("sessionId", sessionId.current);
+
+  console.log("Current sessionId:", sessionId.current, "LocalStorage sessionId:", localStorage.getItem("sessionId"));
   const sendMessage = async () => {
 
     if (!input.trim()) return;
